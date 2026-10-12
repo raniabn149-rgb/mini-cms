@@ -1,3 +1,4 @@
+
 <?php
 
 use App\Http\Controllers\PageController;
@@ -8,12 +9,7 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 
 Route::get('/a-propos', [PageController::class, 'about'])->name('about');
 
-Route::get('/heure', function () {
-    return view('heure', [
-        'heure' => now()->format('H:i'),
-        'date' => now()->format('d/m/Y'),
-    ]);
-});
+Route::get('/heure', [PageController::class, 'time'])->name('time');
 
 Route::prefix('posts')->name('posts.')->group(function () {
     Route::get('/', [PostController::class, 'index'])->name('index');
