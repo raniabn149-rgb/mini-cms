@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PageController::class, 'home'])->name('home');
 
 Route::get('/a-propos', [PageController::class, 'about'])->name('about');
+
 Route::get('/heure', function () {
     return view('heure', [
         'heure' => now()->format('H:i'),
