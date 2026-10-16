@@ -6,27 +6,26 @@ Auteur : Rania Ben Hassen, groupe MDW32.
 
 Mini-CMS évoluera au fil du semestre vers une petite plateforme de publication : pages publiques, back-office authentifié, API JSON et tests Pest. Chaque session se termine par un tag Git (`lab-01`, `lab-01b`, puis un tag par session).
 
-## État actuel (tag lab-02)
+## État actuel (tag lab-02b)
 
--   Routes nommées, toutes servies par des contrôleurs : `PageController` (pages) et `PostController` (articles).
--   Articles stockés dans un tableau PHP, sans base de données pour l'instant.
--   Layout Blade `<x-layout>` avec Tailwind chargé par Vite.
--   Base de données SQLite locale (`database/database.sqlite`, non versionnée).
+-   Pages construites avec des composants Blade anonymes : `x-navbar`, `x-nav-link`, `x-post-card`, `x-alert`, `x-page-header`.
+-   Lien actif dans la navigation avec `request()->routeIs()`.
+-   Articles toujours stockés dans un tableau PHP, sans base de données pour l'instant.
 
 ## Routes disponibles
 
 | Méthode | URI                     | Nom             | Action                   |
-| ------- | ----------------------- | --------------- | ------------------------ | --- |
+| ------- | ----------------------- | --------------- | ------------------------ |
 | GET     | `/`                     | `home`          | `PageController@home`    |
 | GET     | `/a-propos`             | `about`         | `PageController@about`   |
 | GET     | `/heure`                | `time`          | `PageController@time`    |
 | GET     | `/posts`                | `posts.index`   | `PostController@index`   |
 | GET     | `/posts/archive/{year}` | `posts.archive` | `PostController@archive` |
-| GET     | `/posts/{slug}`         | `posts.show`    | `PostController@show`    |     |
+| GET     | `/posts/{slug}`         | `posts.show`    | `PostController@show`    |
 
 ## Prérequis
 
--   PHP et Composer (PHP 8.3 ou plus depuis https://www.php.net/downloads, avec les extensions curl, fileinfo, mbstring, openssl, pdo_sqlite, sqlite3 et zip activées dans php.ini, et Composer depuis https://getcomposer.org).
+-   PHP et Composer (PHP 8.3 ou plus depuis [PHP Downloads](https://www.php.net/downloads), avec les extensions curl, fileinfo, mbstring, openssl, pdo_sqlite, sqlite3 et zip activées dans `php.ini`, et Composer depuis [getcomposer.org](https://getcomposer.org)).
 -   Node.js LTS et npm.
 -   Git.
 
@@ -60,7 +59,7 @@ php artisan migrate
 composer run dev
 ```
 
-Ouvrir ensuite http://localhost:8000 (adresse de l'application, différente de l'adresse de Vite sur le port 5173).
+Ouvrir ensuite [http://localhost:8000](http://localhost:8000) (adresse de l'application, différente de l'adresse de Vite sur le port 5173).
 
 ## Captures d'écran
 
@@ -78,7 +77,7 @@ Ouvrir ensuite http://localhost:8000 (adresse de l'application, différente de l
 
 ### Page À propos
 
-![Page A propos](screenshots/s02-a-propos.png)
+![Page À propos](screenshots/s02-a-propos.png)
 
 ### Accueil avec le layout
 
@@ -91,3 +90,7 @@ Ouvrir ensuite http://localhost:8000 (adresse de l'application, différente de l
 ### Détail d'un article
 
 ![Détail d'un article](screenshots/s03-article.png)
+
+### Session 04
+
+![Liste des articles](screenshots/s04-articles.png)
