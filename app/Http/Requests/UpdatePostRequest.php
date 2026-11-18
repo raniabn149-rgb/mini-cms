@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdatePostRequest extends FormRequest
+class UpdateCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,14 +24,8 @@ class UpdatePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:255', 'regex:/^[a-z0-9-]+$/', Rule::unique('posts', 'slug')->ignore($this->route('post'))],
-            'excerpt' => ['nullable', 'string', 'max:255'],
-            'body' => ['required', 'string', 'min:20'],
-            'is_published' => ['nullable', 'boolean'],
-            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
-            'tags' => ['nullable', 'array'],
-            'tags.*' => ['integer', 'exists:tags,id'],
+            'name' => ['required', 'string', 'max:255', Rule::unique('categories', 'name')->ignore($this->route('category'))],
+            'slug' => ['required', 'string', 'max:255', Rule::unique('categories', 'slug')->ignore($this->route('category'))],
         ];
     }
 }
