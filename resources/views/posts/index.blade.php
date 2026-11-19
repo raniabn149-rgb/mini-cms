@@ -1,20 +1,46 @@
 <x-layout>
     <x-slot:title>{{ $heading }} - Mini-CMS</x-slot:title>
 
-    <x-page-header :title="$heading" />
-    <a href="{{ route('posts.create') }}" class="inline-block mb-6 rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">Nouvel article</a>
+    <x-page-header title="{{ $heading }}" />
 
-    <div class="grid gap-6 md:grid-cols-2">
+    <div class="space-y-6">
         @forelse ($posts as $post)
-            <x-post-card :post="$post" />
+            <article class="rounded-lg border border-gray-200 p-6">
+                <h2 class="text-xl font-bold">
+                    <a href="{{ route('posts.show', $post) }}">
+                        {{ $post->title }}
+                    </a>
+                </h2>
+
+                <p class="mt-2 text-sm text-gray-600">
+                    Auteur : {{ $post->user?->name }}
+                </p>
+
+                @if ($post->category)
+                    <p class="mt-2 text-sm text-gray-600">
+                        Catégorie : {{ $post->category->name }}
+                    </p>
+                @endif
+
+                @if ($post->excerpt)
+                    <p class="mt-3 text-gray-700">{{ $post->excerpt }}</p>
+                @endif
+
+                @if ($post->tags->isNotEmpty())
+                    <p class="mt-2 text-sm text-gray-600">
+                        Tags :
+                        @foreach ($post->tags as $tag)
+                            {{ $tag->name }}@if (! $loop->last), @endif
+                        @endforeach
+                    </p>
+                @endif
+            </article>
         @empty
-            <x-alert type="warning" title="Aucun article" class="md:col-span-2">
-                Il n'y a pas encore d'article.
-            </x-alert>
+            <p class="text-gray-500">Aucun article pour l'instant.</p>
         @endforelse
     </div>
 
-    <div class="mt-8">
+    <div class="mt-6">
         {{ $posts->links() }}
     </div>
 </x-layout>

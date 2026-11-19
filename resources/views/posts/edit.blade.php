@@ -1,3 +1,4 @@
+
 <x-layout>
     <x-slot:title>Modifier {{ $post->title }} - Mini-CMS</x-slot:title>
 

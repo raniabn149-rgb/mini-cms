@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Factories;
-
+use App\Models\User;
 use App\Models\Post;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -27,6 +27,7 @@ class PostFactory extends Factory
             'body' => fake()->paragraphs(3, true),
             'is_published' => false,
             'published_at' => null,
+            'user_id' => User::factory(),
         ];
     }
 

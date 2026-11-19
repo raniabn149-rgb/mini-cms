@@ -1,7 +1,9 @@
+
 <x-layout>
     <x-slot:title>Nouvel article - Mini-CMS</x-slot:title>
 
-    <x-page-header title="Nouvel article" subtitle="Chaque champ est vérifié par le serveur." />
+    <h1 class="text-3xl font-bold text-gray-900">Nouvel article</h1>
+    <p class="mt-2 mb-8 text-gray-600">Remplissez les informations de votre article.</p>
 
     @if ($errors->any())
         <x-alert type="error" title="Le formulaire contient des erreurs" class="mb-6 max-w-2xl">
