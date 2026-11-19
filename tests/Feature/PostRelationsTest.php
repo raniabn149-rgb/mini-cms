@@ -1,47 +1,78 @@
+<?php
 
-<x-layout>
-    <x-slot:title>{{ $heading }} - Mini-CMS</x-slot:title>
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\Tag;
+use App\Models\User;
 
-    <x-page-header title="{{ $heading }}" />
+beforeEach(function () {
+    $this->withoutVite();
+    $this->actingAs(User::factory()->admin()->create());
+});
 
-    <div class="space-y-6">
-        @forelse ($posts as $post)
-            <article class="rounded-lg border border-gray-200 p-6">
-                <h2 class="text-xl font-bold">
-                    <a href="{{ route('posts.show', $post) }}">
-                        {{ $post->title }}
-                    </a>
-                </h2>
+it('lists posts with their category, author and tags without lazy loading', function () {
+    $category = Category::factory()->create(['name' => 'Tutoriels']);
+    $tag = Tag::factory()->create(['name' => 'Astuce']);
+    $author = User::factory()->create(['name' => 'Amira Ben Salah']);
 
-                <p class="mt-2 text-sm text-gray-600">
-                    Auteur : {{ $post->user?->name }}
-                </p>
+    $posts = Post::factory(3)->published()->create([
+        'category_id' => $category->id,
+        'user_id' => $author->id,
+    ]);
 
-                @if ($post->category)
-                    <p class="mt-2 text-sm text-gray-600">
-                        Catégorie : {{ $post->category->name }}
-                    </p>
-                @endif
+    $posts->each(fn (Post $post) => $post->tags()->attach($tag));
 
-                @if ($post->excerpt)
-                    <p class="mt-3 text-gray-700">{{ $post->excerpt }}</p>
-                @endif
+    $this->get(route('posts.index'))
+        ->assertOk()
+        ->assertSee('Tutoriels')
+        ->assertSee('Amira Ben Salah')
+        ->assertSee('Astuce');
+});
 
-                @if ($post->tags->isNotEmpty())
-                    <p class="mt-2 text-sm text-gray-600">
-                        Tags :
-                        @foreach ($post->tags as $tag)
-                            {{ $tag->name }}@if (! $loop->last), @endif
-                        @endforeach
-                    </p>
-                @endif
-            </article>
-        @empty
-            <p class="text-gray-500">Aucun article pour l'instant.</p>
-        @endforelse
-    </div>
+it('keeps the posts when their category is deleted', function () {
+    $category = Category::factory()->create();
+    $post = Post::factory()->create(['category_id' => $category->id]);
 
-    <div class="mt-6">
-        {{ $posts->links() }}
-    </div>
-</x-layout>
+    $category->delete();
+
+    $this->assertDatabaseHas('posts', ['id' => $post->id]);
+    expect($post->fresh()->category_id)->toBeNull();
+});
+
+it('replaces the tags of a post with sync', function () {
+    $post = Post::factory()->create();
+    $tags = Tag::factory(3)->create();
+
+    $post->tags()->attach([$tags[0]->id, $tags[1]->id]);
+    $post->tags()->sync([$tags[1]->id, $tags[2]->id]);
+
+    expect($post->tags()->count())->toBe(2);
+    $this->assertDatabaseMissing('post_tag', ['post_id' => $post->id, 'tag_id' => $tags[0]->id]);
+    $this->assertDatabaseHas('post_tag', ['post_id' => $post->id, 'tag_id' => $tags[2]->id]);
+});
+
+it('removes the pivot rows when a post is deleted', function () {
+    $post = Post::factory()->create();
+    $tag = Tag::factory()->create();
+    $post->tags()->attach($tag);
+
+    $this->delete(route('posts.destroy', $post));
+
+    $this->assertDatabaseMissing('post_tag', ['post_id' => $post->id]);
+    $this->assertDatabaseHas('tags', ['id' => $tag->id]);
+});
+
+it('shows other published posts of the same category', function () {
+    $category = Category::factory()->create();
+    $post = Post::factory()->published()->create(['category_id' => $category->id]);
+
+    Post::factory()->published()->create(['category_id' => $category->id, 'title' => 'Voisin publie']);
+    Post::factory()->create(['category_id' => $category->id, 'title' => 'Voisin brouillon']);
+    Post::factory()->published()->create(['title' => 'Autre categorie']);
+
+    $this->get(route('posts.show', $post))
+        ->assertOk()
+        ->assertSee('Voisin publie')
+        ->assertDontSee('Voisin brouillon')
+        ->assertDontSee('Autre categorie');
+});
