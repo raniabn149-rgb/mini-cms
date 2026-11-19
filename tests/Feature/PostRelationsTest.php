@@ -1,30 +1,47 @@
 
-<?php
+<x-layout>
+    <x-slot:title>{{ $heading }} - Mini-CMS</x-slot:title>
 
-use App\Models\Category;
-use App\Models\Post;
-use App\Models\Tag;
-use App\Models\User;
+    <x-page-header title="{{ $heading }}" />
 
-beforeEach(function () {
-    $this->withoutVite();
-});
+    <div class="space-y-6">
+        @forelse ($posts as $post)
+            <article class="rounded-lg border border-gray-200 p-6">
+                <h2 class="text-xl font-bold">
+                    <a href="{{ route('posts.show', $post) }}">
+                        {{ $post->title }}
+                    </a>
+                </h2>
 
-it('shows the author, category and tags of each post', function () {
-    $user = User::factory()->create(['name' => 'Amira Ben Salah']);
-    $category = Category::factory()->create(['name' => 'Développement']);
-    $tag = Tag::factory()->create(['name' => 'Laravel']);
+                <p class="mt-2 text-sm text-gray-600">
+                    Auteur : {{ $post->user?->name }}
+                </p>
 
-    $post = Post::factory()->published()->create([
-        'user_id' => $user->id,
-        'category_id' => $category->id,
-    ]);
+                @if ($post->category)
+                    <p class="mt-2 text-sm text-gray-600">
+                        Catégorie : {{ $post->category->name }}
+                    </p>
+                @endif
 
-    $post->tags()->attach($tag);
+                @if ($post->excerpt)
+                    <p class="mt-3 text-gray-700">{{ $post->excerpt }}</p>
+                @endif
 
-    $this->get(route('posts.index'))
-        ->assertOk()
-        ->assertSee('Amira Ben Salah')
-        ->assertSee('Développement')
-        ->assertSee('Laravel');
-});
+                @if ($post->tags->isNotEmpty())
+                    <p class="mt-2 text-sm text-gray-600">
+                        Tags :
+                        @foreach ($post->tags as $tag)
+                            {{ $tag->name }}@if (! $loop->last), @endif
+                        @endforeach
+                    </p>
+                @endif
+            </article>
+        @empty
+            <p class="text-gray-500">Aucun article pour l'instant.</p>
+        @endforelse
+    </div>
+
+    <div class="mt-6">
+        {{ $posts->links() }}
+    </div>
+</x-layout>
